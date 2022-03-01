@@ -37,6 +37,7 @@ else:
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 print(CURRENT_PATH)
+print(DATA_DIR)
 
 def train_epoch(model, trainloader, criterion, device, optimizer):
 
