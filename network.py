@@ -18,12 +18,12 @@ class TwoNetworks(nn.Module):
 
         # TODO select all parts of the two pretrained networks, except for
         # the last linear layer.
-        self.fully_conv1 =
-        self.fully_conv2 =
+        self.fully_conv1 = None
+        self.fully_conv2 = None
 
         # TODO create a linear layer that has in_channels equal to
         # the number of in_features from both networks summed together.
-        self.linear = nn.Linear(, num_classes)
+        # self.linear = nn.Linear(, num_classes)
 
 
     def forward(self, inputs1, inputs2):
@@ -52,7 +52,7 @@ class SingleNetwork(nn.Module):
         if weight_init is not None:
             # TODO Here we want an additional channel in the weights tensor, specifically in the first
             # conv2d layer so that there are weights for the infrared channel in the input aswell.
-            current_weights =
+            current_weights = None
 
             if weight_init == "kaiminghe":
               pass
@@ -64,8 +64,9 @@ class SingleNetwork(nn.Module):
             # a model parameter.
             # eg. first_conv_layer.weight = torch.nn.Parameter(your_new_weights)
 
-        # TODO Overwrite the last linear layer.
-        pretrained_net.fc =
+        # DONE? Overwrite the last linear layer.
+        pretrained_net.fc = nn.Linear(512, num_classes)
+
 
         self.net = pretrained_net
 

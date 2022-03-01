@@ -1,8 +1,12 @@
 import torch
 from torch.utils.data import Dataset
+import torchvision.transforms as transforms
 import os
 import PIL.Image
 import pandas as pd
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.model_selection import train_test_split
+import numpy as np
 
 def get_classes_list():
     classes = ['clear', 'cloudy', 'haze', 'partly_cloudy',
@@ -38,33 +42,55 @@ class ChannelSelect(torch.nn.Module):
 
 
 class RainforestDataset(Dataset):
-    def __init__(self, root_dir, trvaltest, transform):
-
-
-        classes, num_classes = get_classes_list()
-
-        # TODO Binarise your multi-labels from the string. HINT: There is a useful sklearn function to
-        # help you binarise from strings.
-
-
-        # TODO Perform a test train split. It's recommended to use sklearn's train_test_split with the following
-        # parameters: test_size=0.33 and random_state=0 - since these were the parameters used
-        # when calculating the image statistics you are using for data normalisation.
+    def __init__(self, root_dir, train, transform):
+        self.image_folder = os.path.join(root_dir, 'train-tif-v2')
+        self.label_csv = os.path.join(root_dir, 'train_v2.csv')
+        self.transform = transform
         
-        #for debugging you can use a test_size=0.66 - this trains then faster
+        # Read from pandas and convert to list
+        df = pd.read_csv(self.label_csv)
+        df['tags'] = df['tags'].str.split()
+        label_lst = df['tags'].tolist()
+        image_filenames = df['image_name'].tolist()
+        # Append all classes to the start of the list so that binarization happens in same order
+        classes, _ = get_classes_list()
+        label_lst = [classes] + label_lst
+        # Binarize
+        mlb = MultiLabelBinarizer()
+        labels = mlb.fit_transform(label_lst)[1:]
+
+        # Split in train and val
+        img_train, img_test, lb_train, lb_test = \
+            train_test_split(image_filenames, labels, test_size=0.4, random_state=100)
+            
+        if train == True: 
+            self.img_filenames, self.labels = img_train, lb_train
+        elif train == False: 
+            self.img_filenames, self.labels = img_test, lb_test
         
-
-        # OR optionally you could do the test train split of your filenames and labels once, save them, and
-        # from then onwards just load them from file.
-
+            
 
     def __len__(self):
         return len(self.img_filenames)
 
     def __getitem__(self, idx):
-        # TODO get the label and filename, and load the image from file.
+        img_path = os.path.join( self.image_folder, self.img_filenames[idx]+'.tif')
+        img = PIL.Image.open(img_path)
+        #to_tensor = transforms.ToTensor()
+        #tensor_img = to_tensor(img)
+        
+        if self.transform is not None: 
+            img = self.transform(img)
 
         sample = {'image': img,
-                  'label': labels,
+                  'label': self.labels[idx],
                   'filename': self.img_filenames[idx]}
         return sample
+
+
+if __name__=='__main__':
+    trans = transforms.Compose([
+            #transforms.ToTensor(),
+            ChannelSelect(channels=[0, 1, 2]),
+        ]),
+    ds = RainforestDataset('/media/lidia/DATA/rainforest/rainforest', train=True, transform=trans)
