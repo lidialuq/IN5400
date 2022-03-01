@@ -27,8 +27,12 @@ from RainforestDataset import RainforestDataset, ChannelSelect
 from network import SingleNetwork, TwoNetworks
 from datetime import datetime
 
+ml_node = True
 
-DATA_DIR = '/mnt/CRAI-NAS/all/lidfer/IN5400/rainforest'
+if ml_node is True:
+    DATA_DIR = '/itf-fi-ml/shared/IN5400/dataforall/mandatory1/'
+else:
+    DATA_DIR = '/mnt/CRAI-NAS/all/lidfer/IN5400/rainforest'
 #DATA_DIR = '/home/lidia/CRAI-NAS/all/lidfer/IN5400/rainforest'
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
