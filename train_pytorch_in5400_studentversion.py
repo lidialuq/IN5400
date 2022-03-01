@@ -30,7 +30,7 @@ from datetime import datetime
 ml_node = True
 
 if ml_node is True:
-    DATA_DIR = '/itf-fi-ml/shared/IN5400/dataforall/mandatory1/'
+    DATA_DIR = '/itf-fi-ml/shared/IN5400/2022 mandatory1'
 else:
     DATA_DIR = '/mnt/CRAI-NAS/all/lidfer/IN5400/rainforest'
 #DATA_DIR = '/home/lidia/CRAI-NAS/all/lidfer/IN5400/rainforest'
