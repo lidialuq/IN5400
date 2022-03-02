@@ -27,8 +27,8 @@ from RainforestDataset import RainforestDataset, ChannelSelect
 from network import SingleNetwork, TwoNetworks
 from datetime import datetime
 
-ml_node = False
-MODEL = 'double4' #Choose between single3, single4 or double4
+ml_node = True
+MODEL = 'single3' #Choose between single3, single4 or double4
 print(f'Using model: {MODEL}')
 
 if ml_node is True:
@@ -165,7 +165,7 @@ def traineval2_model_nocv(dataloader_train, dataloader_test, model, criterion, o
     dic = {'trainlosses': trainlosses,
            'testlosses': testlosses,
            'testperfs': testperfs,
-           }
+           'best_epoch': best_epoch}
     
     with open(os.path.join(RESULTS_PATH, "metrics.pth"), 'wb') as f: 
         pickle.dump(dic, f)

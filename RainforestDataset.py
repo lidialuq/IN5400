@@ -61,7 +61,7 @@ class RainforestDataset(Dataset):
 
         # Split in train and val
         img_train, img_test, lb_train, lb_test = \
-            train_test_split(image_filenames, labels, test_size=0.33, random_state=100)
+            train_test_split(image_filenames, labels, test_size=0.33, random_state=0)
             
         if train == True: 
             self.img_filenames, self.labels = img_train, lb_train
