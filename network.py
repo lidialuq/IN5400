@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 from RainforestDataset import get_classes_list
 
+torch.manual_seed(0)
+#torch.use_deterministic_algorithms(True)
 
 class TwoNetworks(nn.Module):
     '''

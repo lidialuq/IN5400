@@ -6,7 +6,9 @@ import PIL.Image
 import pandas as pd
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import train_test_split
-import numpy as np
+
+torch.manual_seed(0)
+#torch.use_deterministic_algorithms(True)
 
 def get_classes_list():
     classes = ['clear', 'cloudy', 'haze', 'partly_cloudy',
@@ -93,4 +95,4 @@ if __name__=='__main__':
             #transforms.ToTensor(),
             ChannelSelect(channels=[0, 1, 2]),
         ]),
-    ds = RainforestDataset('/media/lidia/DATA/rainforest/rainforest', train=True, transform=trans)
+    ds = RainforestDataset('/media/lidia/DATA/rainforest/rainforest', train=False, transform=trans)
