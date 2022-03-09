@@ -4,39 +4,32 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
-
 import pickle
-
 import torchvision
 from torchvision import datasets, models, transforms, utils
 from torch.utils.data import Dataset, DataLoader
-#import matplotlib.pyplot as plt
-
-from torch import Tensor
-
 import time
 import os
 import numpy as np
-
 import PIL.Image
 import sklearn.metrics
-
 from RainforestDataset import RainforestDataset, ChannelSelect
 from network import SingleNetwork, TwoNetworks
 from datetime import datetime
 
-print('Set seed for reproducibility')
+# set seed for reproducibility
 torch.manual_seed(0)
-#torch.use_deterministic_algorithms(True)
 
-ml_node = False
-MODEL = 'single3' #Choose between single3, single4 or double4
+#-----------------------------------------------------------------------------
+#-------------------USER DEFINED PARAMETERS-----------------------------------
+#-----------------------------------------------------------------------------
+MODEL = 'double4' #Choose between single3, single4 or double4
+DATA_DIR = '/itf-fi-ml/shared/IN5400/2022_mandatory1'
+#----------------------------------------------------------------------------
+
+
+#'/mnt/CRAI-NAS/all/lidfer/IN5400/rainforest_mini'
 print(f'Using model: {MODEL}')
-
-if ml_node is True:
-    DATA_DIR = '/itf-fi-ml/shared/IN5400/2022_mandatory1'
-else:
-    DATA_DIR = '/mnt/CRAI-NAS/all/lidfer/IN5400/rainforest_mini'
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 RESULTS_PATH = os.path.join(CURRENT_PATH, 'results_'+MODEL)
@@ -54,10 +47,7 @@ def train_epoch(model, trainloader, criterion, device, optimizer):
         if (batch_idx %100==0) and (batch_idx>=100):
           print('at batchidx',batch_idx)
     
-        # DONE? calculate the loss from your minibatch.
-        # If you are using the TwoNetworks class you will need to copy the infrared
-        # channel before feeding it into your model. 
-        
+        # calculate the loss from minibatch.
         if MODEL == 'single3' or MODEL == 'single4':
             inputs = data['image'].to(device)        
             outputs = model(inputs)
@@ -106,7 +96,8 @@ def evaluate_meanavgprecision(model, dataloader, criterion, device, numcl):
           loss = criterion(outputs, labels.to(device).float())
           losses.append(loss.item())
           
-          outputs_sig = nn.Sigmoid(outputs)
+          sigmoid = nn.Sigmoid()
+          outputs_sig = sigmoid(outputs)
           # collect prediction scores
           pred_array = outputs_sig.to('cpu').detach().numpy() # output of shape (batch_size, nr_labels)
           concat_pred = np.append(concat_pred, pred_array, axis=0)
@@ -116,7 +107,6 @@ def evaluate_meanavgprecision(model, dataloader, criterion, device, numcl):
           # collect filenames
           fnames.extend(data['filename'])
           
-          #DONE?: collect scores, labels, filenames
 
     avgprecs = sklearn.metrics.average_precision_score(concat_labels, concat_pred, 
                                                        average=None, pos_label=1)

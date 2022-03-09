@@ -3,7 +3,6 @@ import torch.nn as nn
 from RainforestDataset import get_classes_list
 
 torch.manual_seed(0)
-#torch.use_deterministic_algorithms(True)
 
 class TwoNetworks(nn.Module):
     '''
@@ -22,24 +21,20 @@ class TwoNetworks(nn.Module):
         # the last linear layer.
         self.fully_conv1 = nn.Sequential(*(list(pretrained_net1.children())[0:9]))
         self.fully_conv2 = nn.Sequential(*(list(pretrained_net2.children())[0:9]))
-        # TODO create a linear layer that has in_channels equal to
+        # create a linear layer that has in_channels equal to
         # the number of in_features from both networks summed together.
         self.linear = nn.Linear(1024, num_classes)
 
 
     def forward(self, inputs1, inputs2):
-        # TODO feed the inputs through the fully convolutional parts
-        # of the two networks that you initialised above, and then
+        # Feed the inputs through the fully convolutional parts
+        # of the two networks initialised above, then
         # concatenate the features before the linear layer.
-        # And return the result.
         
         features1 = self.fully_conv1(inputs1)
         features2 = self.fully_conv2(inputs2)
         features_all = torch.cat((features1, features2), 1)
         #features_all = torch.flatten(features_all, 1,3)
-        # print(features1.shape)
-        # print(features2.shape)
-        # print(features_all.shape)
         features_all = features_all.view(features_all.size(0), -1)
         out = self.linear(features_all)
 
@@ -61,7 +56,7 @@ class SingleNetwork(nn.Module):
 
 
         if weight_init is not None:
-            # TODO Here we want an additional channel in the weights tensor, specifically in the first
+            # Create additional channel in the weights tensor, specifically in the first
             # conv2d layer so that there are weights for the infrared channel in the input aswell.
             current_weights = pretrained_net.conv1.weight
 
@@ -70,19 +65,15 @@ class SingleNetwork(nn.Module):
                 w_he = nn.init.kaiming_normal_(w)
                 weights = torch.cat((current_weights, w_he), 1)
                 
-            # TODO Create a new conv2d layer, and set the weights to be
-            # what you created above. You will need to pass the weights to
+            # Create a new conv2d layer, and set weights. Pass the weights to
             # torch.nn.Parameter() so that the weights are considered
             # a model parameter.
-            # eg. first_conv_layer.weight = torch.nn.Parameter(your_new_weights)
             pretrained_net.conv1 = nn.Conv2d(4, 64, kernel_size=(7, 7), stride=(2, 2), 
                                    padding=(3,3), bias=False)
-            #with torch.no_grad():
-            #pretrained_net.conv1.weight.data.fill_(weights)
             pretrained_net.conv1.weight = torch.nn.Parameter(weights)
             
 
-        # DONE? Overwrite the last linear layer.
+        # Overwrite the last linear layer.
         pretrained_net.fc = nn.Linear(512, num_classes)
 
 

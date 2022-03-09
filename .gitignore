@@ -1,4 +1,5 @@
 rainforest/
 rainforest_mini/
-model.pth
-metrics.pth
+final_results/results_double4/model.pth
+final_results/results_single4/model.pth
+final_results/results_single3/model.pth
